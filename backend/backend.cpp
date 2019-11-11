@@ -1,6 +1,12 @@
-// backend.cpp : Definiert die exportierten Funktionen für die DLL-Anwendung.
+﻿// backend.cpp: Definiert den Einstiegspunkt für die Anwendung.
 //
 
-#include "stdafx.h"
+#include "backend.h"
 
+using namespace std;
 
+int main()
+{
+	cout << "Hello CMake." << endl;
+	return 0;
+}
