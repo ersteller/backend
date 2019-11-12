@@ -13,11 +13,32 @@ We would like to see working solution and review code, project structure, tests.
 
 
 
+checkout: 
+```
+git clone https://github.com/ersteller/backend.git --recurse-submodules
+git submodule update --init
+```
+
 build docker: 
 ```
 docker build . -t builder:latest
 ```
+
 start docker with following command:
 ```
 docker run -it -v D:\Users\z_jan_cronus\workspace\backend\build:/build -v D:\Users\z_jan_cronus\workspace\backend\:/project builder:latest /bin/bash
+```
+
+to build qpid 
+```
+mkdir /project/libs/qpid-cpp/build -p && cd /project/libs/qpid-cpp/build && cmake .. && make
+```
+
+for building backend 
+```
+cmake ../project/backend/ && make
+```
+to run a test:  
+```
+python ../project/tests/loadlib.py
 ```

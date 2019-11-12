@@ -6,7 +6,14 @@ RUN apt-get update && apt-get install -y  \
     gcc g++ git-core \
     make \
     cmake \
-    sqlite3
+    sqlite3 \
+    uuid-dev \
+    cmake-curses-gui \
+    libssl-dev \
+    libsasl2-2 libsasl2-dev libsasl2-modules 
+RUN apt-get install -y \
+    python-setuptools
+    #e2fsprogs \
 
 RUN mkdir /project
 
