@@ -38,12 +38,16 @@ To build qpid-proton
 ```
 mkdir /project/libs/qpid-proton/build -p && cd /project/libs/qpid-proton/build && cmake .. && make
 ``` 
+To build qpid proton python bindings 
+```
+ cd /project/libs/qpid-proton/build && cmake .. -DSYSINSTALL_PYTHON=ON -DSYSINSTALL_BINDINGS=OFF
+```
 
 For building backend 
 ```
 cmake ../project/backend/ && make
 ```
-To run a test:  
+To run a backend test:  
 ```
 python ../project/tests/loadlib.py
 ```

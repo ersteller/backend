@@ -12,8 +12,17 @@ RUN apt-get update && apt-get install -y  \
     libssl-dev \
     libsasl2-2 libsasl2-dev libsasl2-modules 
 RUN apt-get install -y \
-    python-setuptools
-    #e2fsprogs \
+    python-setuptools \
+    jsoncpp-devel 
+
+ # Dependencies needed to generate documentation
+RUN apt-get install -y  \
+    epydoc rubygem-yard doxygen
+
+    # dependencies needed for bindings
+RUN apt-get install -y swig python-dev ruby-dev python-epydoc
+
+
 
 RUN mkdir /project
 
