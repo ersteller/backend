@@ -1,3 +1,6 @@
 [submodule "libs/qpid-cpp"]
 	path = libs/qpid-cpp
 	url = https://github.com/apache/qpid-cpp.git
+[submodule "libs/qpid-proton"]
+	path = libs/qpid-proton
+	url = https://github.com/apache/qpid-proton.git
