@@ -25,6 +25,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata
 RUN apt-get install -y swig python-dev ruby-dev python-epydoc
+RUN apt-get install -y libsqlite3-dev --fix-missing
 
 RUN mkdir /project
 

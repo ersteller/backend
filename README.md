@@ -35,19 +35,20 @@ mkdir /project/libs/qpid-cpp/build -p && cd /project/libs/qpid-cpp/build && cmak
 ```
 
 To build qpid-proton
+maybe we dont need this:  -DCMAKE_CXX_FLAGS=-std=c++11
 ```
 mkdir /project/libs/qpid-proton/build -p && cd /project/libs/qpid-proton/build && cmake .. && make
 ``` 
 To build qpid proton python bindings 
 ```
- cd /project/libs/qpid-proton/build && cmake .. -DSYSINSTALL_PYTHON=ON -DSYSINSTALL_BINDINGS=OFF
+cd /project/libs/qpid-proton/build && cmake .. -DSYSINSTALL_PYTHON=ON -DSYSINSTALL_BINDINGS=OFF
 ```
 
 For building backend 
 ```
-cmake ../project/backend/ && make
+cd /build && cmake /project/backend/ && make
 ```
 To run a backend test:  
 ```
-python ../project/tests/loadlib.py
+cd /build && python /project/tests/loadlib.py
 ```
