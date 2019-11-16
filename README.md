@@ -21,7 +21,7 @@ git submodule update --init
 
 Build docker: 
 ```
-docker build . -t builder:latest
+docker build . -t builder:latest -f ./dev/Dockerfile
 ```
 
 Btart docker with following command:
@@ -51,4 +51,16 @@ cd /build && cmake /project/backend/ && make
 To run a backend test:  
 ```
 cd /build && python /project/tests/loadlib.py
+```
+
+To start and stop a local broker call following script
+this boker will have a queue named "examples" ready
+```
+./dev/start_broker.sh
+./dev/stop_broker.sh
+``` 
+
+To run the application call
+```
+./backend //<yourBrokerIp>:5672 examples
 ```

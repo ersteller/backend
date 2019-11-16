@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y  \
     libssl-dev \
     libsasl2-2 libsasl2-dev libsasl2-modules 
 RUN apt-get install -y \
-    python-setuptools 
+    python-setuptools
 
 # Dependencies needed to generate documentation
 # RUN apt-get install -y  \
@@ -24,8 +24,12 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y tzdata && \
     ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata
-RUN apt-get install -y swig python-dev ruby-dev python-epydoc
-RUN apt-get install -y libsqlite3-dev --fix-missing
+RUN apt-get install -y swig python-dev ruby-dev python-epydoc 
+RUN apt-get install -y libsqlite3-dev --fix-missing 
+
+# if building binding or installing fails one could try to install from pip
+RUN apt-get install -y python-pip 
+RUN pip install python-qpid-proton
 
 RUN mkdir /project
 
