@@ -18,6 +18,8 @@
  * under the License.
  *
  */
+
+
 #include <iostream>
 #include <proton/connection.hpp>
 #include <proton/container.hpp>
@@ -30,22 +32,55 @@
 
 using namespace std;
 
+typedef void (*ClbFunctionType)(proton::sender &s);
 
-hello_world::hello_world(const std::string& u, const std::string& a) :
-	conn_url_(u), addr_(a) {}
-void hello_world::on_container_start(proton::container& c)  {
+Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(proton::sender &s), string szDbPath ) {		
+    conn_url_ = u;
+	addr_ = a;
+	m_pfnSendable = (void*)funSendable;	
+	m_szDBPath = szDbPath;
+}
+//Backend::~Backend(){
+//	sqlite3_close(m_db);
+//}
+void Backend::init(){
+	/* if we have a path then we load the database */
+	if (!m_szDBPath.empty())
+	{
+		int rc = sqlite3_open(m_szDBPath.c_str(), &m_db);
+		if (NULL == m_db){
+			cout << m_szDBPath << " not found" << endl;
+			exit (1);
+		} else {
+			cout << m_szDBPath << " loaded" << endl; 
+		}
+	}
+}
+
+void Backend::on_container_start(proton::container& c)  {
 	c.connect(conn_url_);
 }
-void hello_world::on_connection_open(proton::connection& c)  {
+void Backend::on_connection_open(proton::connection& c)  {
 	c.open_receiver(addr_);
 	c.open_sender(addr_);
 }
-void hello_world::on_sendable(proton::sender &s)  {
-	proton::message m("Hello World!");
-	s.send(m);
+void Backend::on_sendable(proton::sender &s)  {
+	proton::message m("Hello from baackend!");
+	m_sender = s;
+	// s.send(m);
+    
+	if (m_pfnSendable)
+	{
+		ClbFunctionType clbSendable = (ClbFunctionType)m_pfnSendable;
+		clbSendable(s);
+	}
 	s.close();
 }
-void hello_world::on_message(proton::delivery &d, proton::message &m)  {
+void Backend::on_message(proton::delivery &d, proton::message &m)  {
 	std::cout << m.body() << std::endl;
 	d.connection().close();
 }
+void Backend::on_connection_close(proton::connection &) {
+	m_sender.close();
+}
+

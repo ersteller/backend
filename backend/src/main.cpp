@@ -1,43 +1,46 @@
 
-#include <dlfcn.h>
-#include <sqlite3.h>
+
 #include <proton/container.hpp>
 #include "backend.hpp"
-#include <errno.h>
 
 using namespace std;
 
-int main(int argc, char **argv) {
-    sqlite3 *db;
-	void* sql = dlopen("libsqlite3.so", RTLD_LAZY);
-	if (NULL == sql)
-	{
-		cout << "Error: sqlite not found" << endl;
-		exit(1);
-	} else {
-        cout << "sqlite loaded" << endl;
-    }
+static void testFunction(proton::sender &s){
 
-    int rc = sqlite3_open("database.db", &db);
-    if (NULL == db){
-        cout << "database.db not found" << endl;
-        exit (1);
-    } else 
-        cout << "database.db loaded" << endl;
+	
+
+	// 1. Send a message to MQ
+
+	// 2. Receive message from MQ
+
+	// 3. Persist Messages in a Database (choose Columns appropriate)
+    // 4. Return invalid Message to Sender 
+
+}
+
+int main(int argc, char **argv) {
+	int iRet = 1;
 
 	try {
 		std::string conn_url = argc > 1 ? argv[1] : "//127.0.0.1:5672";
 		std::string addr = argc > 2 ? argv[2] : "examples";
-		hello_world hw(conn_url, addr);
-		proton::container(hw).run();
-		return 0;
+
+		/* create instance of ouf class */
+		Backend backend(conn_url, addr, testFunction, "database.db");
+		backend.init();
+
+		/* let proton handle handshaking */
+	    proton::container(backend).run();
+
+		iRet = 0;
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
 	}
+	
+	/* we are done now and start to clean up */
+	cout << "cleanup now" << endl;
 
 
-    sqlite3_close(db);
-
-	return 1;
+	return iRet;
 }
