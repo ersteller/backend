@@ -29,5 +29,8 @@ target_include_directories(backend PRIVATE ../libs/qpid-proton/build/c/include)
 #target_include_directories(backend PRIVATE ../libs/qpid-proton/cpp/include/proton/codec)
 #target_include_directories(backend PRIVATE ../libs/qpid-proton/cpp/include/proton)
 
-# TODO: Fügen Sie bei Bedarf Tests hinzu, und installieren Sie Ziele.
-# add_test(NAME loadlib COMMAND "python ../tests/loadlib.py")
+# copy the template db
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../dev/database.db
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# TODO: add testcases for "make test"

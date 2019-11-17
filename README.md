@@ -13,6 +13,18 @@ We would like to see working solution and review code, project structure, tests.
 
 
 
+TODO: 
+1. Send a message to MQ
+2. Receive message from MQ
+3. Persist Messages in a Database (choose Columns appropriate)
+4. Return invalid Message to Sender 
+5. review code, 
+6. project structure
+7. tests
+
+review code, project structure, tests. 
+
+
 checkout: 
 ```
 git clone https://github.com/ersteller/backend.git --recurse-submodules
@@ -26,7 +38,7 @@ docker build . -t builder:latest -f ./dev/Dockerfile
 
 Btart docker with following command:
 ```
-docker run -it -v D:\Users\z_jan_cronus\workspace\backend\build:/build -v D:\Users\z_jan_cronus\workspace\backend\:/project builder:latest /bin/bash
+docker run -it -v D:\Users\z_jan_cronus\workspace\backend\build:/build -v D:\Users\z_jan_cronus\workspace\backend\:/project --name builder builder:latest /bin/bash
 ```
 
 To build qpid-cpp
@@ -47,6 +59,7 @@ cd /project/libs/qpid-proton/build && cmake .. -DSYSINSTALL_PYTHON=ON -DSYSINSTA
 For building backend 
 ```
 cd /build && cmake /project/backend/ && make
+cd /build && cmake -DCMAKE_BUILD_TYPE=Debug /project/backend/ && make 
 ```
 To run a backend test:  
 ```
@@ -63,4 +76,5 @@ this boker will have a queue named "examples" ready
 To run the application call
 ```
 ./backend //<yourBrokerIp>:5672 examples
+./backend //192.168.178.56:5672 examples
 ```

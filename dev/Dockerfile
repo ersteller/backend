@@ -3,7 +3,7 @@ FROM ubuntu:latest as BASE
 RUN apt-get update && apt-get install -y  \
     libboost-all-dev \
     ruby-full \
-    gcc g++ git-core \
+    gcc g++ git-core gdb \
     make \
     cmake \
     sqlite3 \
