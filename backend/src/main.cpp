@@ -25,14 +25,15 @@ int main(int argc, char **argv) {
 		std::string conn_url = argc > 1 ? argv[1] : "//127.0.0.1:5672";
 		std::string addr = argc > 2 ? argv[2] : "examples";
 
-		/* create instance of ouf class */
+		/* create instance of ouf class and let it call our test function when it is ready */
 		Backend backend(conn_url, addr, testFunction, "database.db");
 		backend.init();
 
-		/* let proton handle handshaking */
+		/* let proton handle handshaking */ 
+		// this is not elegant TODO: find a way to hide it in the backend class
 	    proton::container(backend).run();
 
-		iRet = 0;
+		iRet = 0; 
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;

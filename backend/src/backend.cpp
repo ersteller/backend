@@ -40,9 +40,12 @@ Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(
 	m_pfnSendable = (void*)funSendable;	
 	m_szDBPath = szDbPath;
 }
-//Backend::~Backend(){
-//	sqlite3_close(m_db);
-//}
+
+/* destructor */
+Backend::~Backend(){
+	sqlite3_close(m_db);
+}
+
 void Backend::init(){
 	/* if we have a path then we load the database */
 	if (!m_szDBPath.empty())
@@ -76,8 +79,20 @@ void Backend::on_sendable(proton::sender &s)  {
 	}
 	s.close();
 }
+
+/* this is the send wrapper four our class */
+void Backend::send(const proton::message &m) { 
+	m_sender.send(m);
+}
+
+// this is a wrapper with sql log for the base function: virtual void on_message(delivery&, message&);
+void Backend::receive(proton::delivery &d,  proton::message &m) { 
+	cout << "wait for received message: " << m.body() << endl; 
+	return on_message(d, m);
+}
+
 void Backend::on_message(proton::delivery &d, proton::message &m)  {
-	std::cout << m.body() << std::endl;
+	std::cout << "received: " << m.body() << std::endl;
 	d.connection().close();
 }
 void Backend::on_connection_close(proton::connection &) {

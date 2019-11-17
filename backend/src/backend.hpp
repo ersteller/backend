@@ -17,14 +17,16 @@ public:
 	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(proton::sender &s), std::string szDbPath = std::string()); 
 
 	/* destructor */
-	//~Backend();
+	~Backend();
 
 	/* the class needs to be initialized; 
 	    only then is the sender started and the database opened */
 	void init();
 
-	//void send();
-	//void receive(); // virtual void on_message(delivery&, message&);
+	void send(const proton::message &m);
+
+	/*  blocking call for on_message callback: virtual void on_message(delivery&, message&); */
+	void receive(proton::delivery&, proton::message&); 
 
 	void on_container_start(proton::container& c) override;
 	void on_connection_open(proton::connection& c) override;
