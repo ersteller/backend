@@ -1,19 +1,23 @@
 
 
 #include <proton/container.hpp>
+#include <proton/message.hpp>
 #include "backend.hpp"
 
 using namespace std;
 
-static void testFunction(proton::sender &s){
+static void testFunction(Backend &backend){
 
-	
+	proton::message m("Hello from testcase!");
 
 	// 1. Send a message to MQ
+	backend.send(m);
 
 	// 2. Receive message from MQ
-
+	proton::message resMessage;
+	backend.receive(resMessage);
 	// 3. Persist Messages in a Database (choose Columns appropriate)
+
     // 4. Return invalid Message to Sender 
 
 }

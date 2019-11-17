@@ -1,7 +1,7 @@
 # backend
 
 3. BACKEND (C++ AND JAVA) 
-Create client libraries to interact with selected Message Broker, preferred Qpid over AMQP, but can be any JMS broker.  
+Create client libraries to interact with selected Message Broker, preferred Qpid over AMQP, but can be any JMS broker. 
 Libraries must have classes to: 
 - Send a message to MQ 
 - Receive message from MQ 
@@ -12,9 +12,9 @@ We would like to see working solution and review code, project structure, tests.
 - (or) Send, via email, project sources and instructions how to start it 
 
 
-
-TODO: 
+DONE
 1. Send a message to MQ
+TODO: 
 2. Receive message from MQ
 3. Persist Messages in a Database (choose Columns appropriate)
 4. Return invalid Message to Sender 

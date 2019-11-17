@@ -21,6 +21,9 @@
 
 
 #include <iostream>
+#include <stdio.h>
+#include <sys/time.h>
+
 #include <proton/connection.hpp>
 #include <proton/container.hpp>
 #include <proton/delivery.hpp>
@@ -68,9 +71,7 @@ void Backend::on_connection_open(proton::connection& c)  {
 	c.open_sender(addr_);
 }
 void Backend::on_sendable(proton::sender &s)  {
-	proton::message m("Hello from baackend!");
 	m_sender = s;
-	// s.send(m);
     
 	if (m_pfnSendable)
 	{
@@ -80,13 +81,47 @@ void Backend::on_sendable(proton::sender &s)  {
 	s.close();
 }
 
+static int dbCallback(void*,int,char**,char**)
+{
+	return 0;
+}
+
 /* this is the send wrapper four our class */
-void Backend::send(const proton::message &m) { 
+void Backend::send(const proton::message &m) {
+
+	char* szError = NULL;
+	// time, topic, src, dst, message
+	const char* szSqlFmt = "INSERT INTO table_name (time, topic, src, dst, message) VALUES (%"PRId64", %s, %s, %s, %s); "
+	const char szSql[4096] = {};
+
+	char* szTopic = addr_.c_str();
+	char* szSrc = "localhost";
+	char* szDest = conn_url_;
+
+	/* get a timestamp of microsec */
+	uint64_t ullTsusec = 0;
+	struct timeval tv = {0};
+	int gettimeofday(&tv, NULL);
+	ullTsusec = tv.tv_sec * 1000000 + tv.tv_usec
+	
+	sprintf(szSql, szSqlFmt, ullTsusec, szTopic, szSrc, szDest, m.body);
+
+	sqlite3_exec(
+					m_db,                                      /* An open database */
+					sql,                                       /* SQL to be evaluated */
+					dbCallbackr,                               /* Callback function */
+					(void*)this,                               /* 1st argument to callback */
+					&szError                                   /* Error msg written here */
+				);
+	
 	m_sender.send(m);
+
 }
 
 // this is a wrapper with sql log for the base function: virtual void on_message(delivery&, message&);
 void Backend::receive(proton::delivery &d,  proton::message &m) { 
+
+
 	cout << "wait for received message: " << m.body() << endl; 
 	return on_message(d, m);
 }
