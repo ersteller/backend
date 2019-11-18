@@ -36,9 +36,9 @@
 
 using namespace std;
 
-typedef void (*ClbFunctionType)(Backend* s);
+typedef void (*ClbFunctionType)(Backend& s);
 
-Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(Backend *s), string szDbPath ) {		
+Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(Backend &s), string szDbPath ) {		
     conn_url_ = u;
 	addr_ = a;
 	m_pfnSendable = (void*)funSendable;	
@@ -77,7 +77,7 @@ void Backend::on_sendable(proton::sender &s)  {
 	if (m_pfnSendable)
 	{
 		ClbFunctionType clbSendable = (ClbFunctionType)m_pfnSendable;
-		clbSendable(this);
+		clbSendable(*this);
 	}
 	s.close();
 }

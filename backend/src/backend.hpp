@@ -14,7 +14,7 @@ class Backend : public proton::messaging_handler {
 public:
 	/* the constructor takes a function pfnIsReady that is
 	    called with an object that has a member function send and receive */
-	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend *b), std::string szDbPath = std::string()); 
+	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath = std::string()); 
 
 	/* destructor */
 	~Backend();
