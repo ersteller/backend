@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <sys/time.h>
+#include <inttypes.h>
 
 #include <proton/connection.hpp>
 #include <proton/container.hpp>
@@ -35,9 +36,9 @@
 
 using namespace std;
 
-typedef void (*ClbFunctionType)(proton::sender &s);
+typedef void (*ClbFunctionType)(Backend* s);
 
-Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(proton::sender &s), string szDbPath ) {		
+Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(Backend *s), string szDbPath ) {		
     conn_url_ = u;
 	addr_ = a;
 	m_pfnSendable = (void*)funSendable;	
@@ -76,7 +77,7 @@ void Backend::on_sendable(proton::sender &s)  {
 	if (m_pfnSendable)
 	{
 		ClbFunctionType clbSendable = (ClbFunctionType)m_pfnSendable;
-		clbSendable(s);
+		clbSendable(this);
 	}
 	s.close();
 }
@@ -91,25 +92,25 @@ void Backend::send(const proton::message &m) {
 
 	char* szError = NULL;
 	// time, topic, src, dst, message
-	const char* szSqlFmt = "INSERT INTO table_name (time, topic, src, dst, message) VALUES (%"PRId64", %s, %s, %s, %s); "
-	const char szSql[4096] = {};
+	const char* szSqlFmt = "INSERT INTO table_name (time, topic, src, dst, message) VALUES (%"PRId64", %s, %s, %s, \"%s\"); ";
+	char szSql[4096] = {};
 
-	char* szTopic = addr_.c_str();
+	const char* szTopic = addr_.c_str();
+	const char* szDest = conn_url_.c_str();
 	char* szSrc = "localhost";
-	char* szDest = conn_url_;
 
 	/* get a timestamp of microsec */
 	uint64_t ullTsusec = 0;
 	struct timeval tv = {0};
-	int gettimeofday(&tv, NULL);
-	ullTsusec = tv.tv_sec * 1000000 + tv.tv_usec
+	gettimeofday( &tv, NULL);
+	ullTsusec = tv.tv_sec * 1000000 + tv.tv_usec;
 	
-	sprintf(szSql, szSqlFmt, ullTsusec, szTopic, szSrc, szDest, m.body);
+	sprintf(szSql, szSqlFmt, ullTsusec, szTopic, szSrc, szDest, m.body());
 
 	sqlite3_exec(
 					m_db,                                      /* An open database */
-					sql,                                       /* SQL to be evaluated */
-					dbCallbackr,                               /* Callback function */
+					szSql,                                       /* SQL to be evaluated */
+					dbCallback,                               /* Callback function */
 					(void*)this,                               /* 1st argument to callback */
 					&szError                                   /* Error msg written here */
 				);
@@ -119,11 +120,12 @@ void Backend::send(const proton::message &m) {
 }
 
 // this is a wrapper with sql log for the base function: virtual void on_message(delivery&, message&);
-void Backend::receive(proton::delivery &d,  proton::message &m) { 
+proton::message Backend::receive(  ) { 
 
-
+	/* TODO: get it from on_message  */
+	proton::message m("Received this message!"); 
 	cout << "wait for received message: " << m.body() << endl; 
-	return on_message(d, m);
+	return m;
 }
 
 void Backend::on_message(proton::delivery &d, proton::message &m)  {

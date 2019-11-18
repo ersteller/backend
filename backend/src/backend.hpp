@@ -14,7 +14,7 @@ class Backend : public proton::messaging_handler {
 public:
 	/* the constructor takes a function pfnIsReady that is
 	    called with an object that has a member function send and receive */
-	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(proton::sender &s), std::string szDbPath = std::string()); 
+	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend *b), std::string szDbPath = std::string()); 
 
 	/* destructor */
 	~Backend();
@@ -26,7 +26,7 @@ public:
 	void send(const proton::message &m);
 
 	/*  blocking call for on_message callback: virtual void on_message(delivery&, message&); */
-	void receive(proton::delivery&, proton::message&); 
+	proton::message receive(); 
 
 	void on_container_start(proton::container& c) override;
 	void on_connection_open(proton::connection& c) override;
@@ -34,7 +34,7 @@ public:
 	void on_message(proton::delivery &d, proton::message &m) override;
 	void on_connection_close(proton::connection &) override;
 private: 
-	void* m_pfnSendable;  //  void m_pfnSendable(proton::sender &s);
+	void* m_pfnSendable;      // similar to void m_pfnSendable(proton::sender &s);
 	proton::sender m_sender;
 	sqlite3 *m_db;
 	std::string m_szDBPath;
