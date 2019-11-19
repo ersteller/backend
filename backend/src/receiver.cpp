@@ -51,6 +51,9 @@ void BReceiver::on_message(proton::delivery &d, proton::message &msg) {
         return; // Ignore duplicate
     }
 
+    /* log message to database */
+    logToDatabase(msg, std::string("localhost"), conn_url_);
+
     if (expected == 0 || received < expected) {
         std::cout << msg.body() << std::endl;
         received++;

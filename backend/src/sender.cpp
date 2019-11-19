@@ -38,6 +38,8 @@ void BSender::on_sendable(proton::sender &sender) {
         msg.id(sent + 1);
         msg.body(m);
 
+        logToDatabase(msg, conn_url_, std::string("localhost"));
+
         sender.send(msg);
         sent++;
     }
