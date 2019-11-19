@@ -45,6 +45,9 @@ Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(
 	m_szDBPath = szDbPath;
 }
 
+/* default constructo */
+Backend::Backend(){}
+
 /* destructor */
 Backend::~Backend(){
 	sqlite3_close(m_db);

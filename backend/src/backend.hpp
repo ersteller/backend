@@ -13,10 +13,15 @@
 
 
 class Backend : public proton::messaging_handler {
-	std::string conn_url_;
-	std::string addr_;
-
 public:
+
+	/* the constructor takes a function pfnIsReady that is
+	    called with an object that has a member function send and receive */
+	Backend();
+	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath, int c);
+	/* destructor */
+	~Backend();
+
 
 	/* the class needs to be initialized;
 	    only then is the sender started and the database opened */
@@ -43,12 +48,11 @@ public:
 		}
 	};
 private:
-	/* the constructor takes a function pfnIsReady that is
-	    called with an object that has a member function send and receive */
-	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath = std::string(), int c);
-	/* destructor */
-	~Backend();
 
+protected:
+	std::string conn_url_; // this should be protected 
+	std::string addr_;
+	
 	void* m_pfnSendable;      // similar to void m_pfnSendable(proton::sender &s);
 	proton::sender m_sender;
 	sqlite3 *m_db;
@@ -89,8 +93,8 @@ class BReceiver : public Backend {
     BReceiver( const std::string &s, 
 	             const std::string& a, 
 				 void(*pfnIsReady)(Backend& b), 
-				 std::string szDbPath = std::string(), 
-				 int c=1);
+				 std::string szDbPath, 
+				 int c);
 	~BReceiver();
     void on_container_start(proton::container &c) override;
     void on_message(proton::delivery &d, proton::message &msg) override;

@@ -18,9 +18,6 @@
  * under the License.
  *
  */
-
-#include "options.hpp"
-
 #include <proton/connection.hpp>
 #include <proton/container.hpp>
 #include <proton/delivery.hpp>
@@ -35,9 +32,17 @@
 
 #include "backend.hpp"
 
-    BReceiver::BReceiver(const std::string &s, int c) : url(s), expected(c), received(0) {}
+BReceiver::BReceiver(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath, int c) {
+    conn_url_ = u;
+    addr_ = a;
+    received = 0;
+    expected = c;
+}
+
+BReceiver::~BReceiver() {}
 
 void BReceiver::on_container_start(proton::container &c)  {
+    std::string url = conn_url_ + std::string("/") + addr_;
     listener = c.listen(url, listen_handler);
 }
 

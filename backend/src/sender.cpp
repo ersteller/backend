@@ -27,6 +27,7 @@ BSender::BSender(const std::string &s,
     confirmed = 0;
     total = 0;
 }
+BSender::~BSender(){}
 
 void BSender::on_sendable(proton::sender &sender) {
     while (sender.credit() && sent < total) {
@@ -43,6 +44,7 @@ void BSender::on_sendable(proton::sender &sender) {
 }
 
 void BSender::on_container_start(proton::container &c) {
+    std::string url = conn_url_ + std::string("/") + addr_;
     listener = c.listen(url, listen_handler);
 }
 void BSender::on_tracker_accept(proton::tracker &t) {
