@@ -38,7 +38,7 @@ using namespace std;
 
 typedef void (*ClbFunctionType)(Backend& s);
 
-Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(Backend &s), string szDbPath ) {		
+Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(Backend &s), string szDbPath, int c) {		
     conn_url_ = u;
 	addr_ = a;
 	m_pfnSendable = (void*)funSendable;	

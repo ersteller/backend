@@ -35,7 +35,7 @@
 
 #include "backend.hpp"
 
-    BReceiver::direct_recv(const std::string &s, int c) : url(s), expected(c), received(0) {}
+    BReceiver::BReceiver(const std::string &s, int c) : url(s), expected(c), received(0) {}
 
 void BReceiver::on_container_start(proton::container &c)  {
     listener = c.listen(url, listen_handler);

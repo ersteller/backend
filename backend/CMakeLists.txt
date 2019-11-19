@@ -5,8 +5,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project(backend VERSION 1.0.1 DESCRIPTION "backend description")
 
-add_executable (backend src/backend.cpp "src/backend.hpp" src/main.cpp)
-#add_library(backend SHARED src/backend.cpp "src/backend.hpp" src/main.cpp)
+add_executable (backend src/backend.cpp "src/backend.hpp" src/main.cpp src/sender.cpp src/receiver.cpp)
+#add_library(backend SHARED src/backend.cpp "src/backend.hpp" src/main.cpp src/sender.cpp src/receiver.cpp)
 set_target_properties(backend PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(backend PROPERTIES PUBLIC_HEADER include/backend_pub.h)
 

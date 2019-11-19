@@ -14,9 +14,9 @@ We would like to see working solution and review code, project structure, tests.
 
 DONE
 1. Send a message to MQ
+3. Persist Messages in a Database (choose Columns appropriate)
 TODO: 
 2. Receive message from MQ
-3. Persist Messages in a Database (choose Columns appropriate)
 4. Return invalid Message to Sender 
 5. review code, 
 6. project structure

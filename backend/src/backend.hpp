@@ -45,7 +45,7 @@ public:
 private:
 	/* the constructor takes a function pfnIsReady that is
 	    called with an object that has a member function send and receive */
-	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath = std::string());
+	Backend(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath = std::string(), int c);
 	/* destructor */
 	~Backend();
 
@@ -60,7 +60,6 @@ private:
 class BSender : public Backend {
   private:
 
-    std::string url;
     proton::listener listener;
     int sent;
     int confirmed;
@@ -82,7 +81,6 @@ class BSender : public Backend {
 
 class BReceiver : public Backend {
   private:
-    std::string url;
     proton::listener listener;
     int expected;
     int received;
