@@ -87,17 +87,18 @@ static int dbCallback(void*,int,char**,char**)
 	return 0;
 }
 
-/* this is the send wrapper four our class */
-void Backend::send(const proton::message &m) {
+void Backend::logToDatabase(const proton::message& m, std::string dst, std::string src){
 
 	char* szError = NULL;
-	// time, topic, src, dst, message
-	const char* szSqlFmt = "INSERT INTO table_name (time, topic, src, dst, message) VALUES (%"PRId64", %s, %s, %s, \"%s\"); ";
+	/* time, topic, src, dst, message matches pur database template database.db */
+	const char* szSqlFmt = "INSERT INTO messagelog (time, topic, src, dst, message) VALUES (%"PRId64", \"%s\", \"%s\", \"%s\", \"%s\"); ";
 	char szSql[4096] = {};
 
 	const char* szTopic = addr_.c_str();
-	const char* szDest = conn_url_.c_str();
-	char* szSrc = "localhost";
+	const char* szDest = dst.c_str();     // m.to().c_str();
+	const char* szSrc = src.c_str();
+	char* szBody = &m.encode()[13];       // m.body().c_str(); is not working this is some dirty stuff and should not be in 
+	                                      //  production code but would need more research of proton api 
 
 	/* get a timestamp of microsec */
 	uint64_t ullTsusec = 0;
@@ -105,18 +106,21 @@ void Backend::send(const proton::message &m) {
 	gettimeofday( &tv, NULL);
 	ullTsusec = tv.tv_sec * 1000000 + tv.tv_usec;
 	
-	sprintf(szSql, szSqlFmt, ullTsusec, szTopic, szSrc, szDest, m.body());
-
+	/* prepare the sql statement to be evaluated */
+	sprintf(szSql, szSqlFmt, ullTsusec, szTopic, szSrc, szDest, szBody);
 	sqlite3_exec(
-					m_db,                                      /* An open database */
-					szSql,                                       /* SQL to be evaluated */
+					m_db,                                     /* An open database */
+					szSql,                                    /* SQL to be evaluated */
 					dbCallback,                               /* Callback function */
-					(void*)this,                               /* 1st argument to callback */
-					&szError                                   /* Error msg written here */
+					(void*)this,                              /* 1st argument to callback */
+					&szError                                  /* Error msg written here */
 				);
-	
-	m_sender.send(m);
+}
 
+/* this is the send wrapper four our class */
+void Backend::send(const proton::message &m) {
+	logToDatabase(m, conn_url_, std::string("localhost"));
+	m_sender.send(m);
 }
 
 // this is a wrapper with sql log for the base function: virtual void on_message(delivery&, message&);

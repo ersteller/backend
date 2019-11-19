@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sqlite3.h>
 
+
 class Backend : public proton::messaging_handler {
 	std::string conn_url_;
 	std::string addr_;
@@ -23,7 +24,11 @@ public:
 	    only then is the sender started and the database opened */
 	void init();
 
+	/* when class is ready use this function to send a message to the broker */
 	void send(const proton::message &m);
+
+	/* logs a message to the database takes current time and additionally dst and src */
+	void logToDatabase(const proton::message& m, std::string dst = std::string(), std::string src = std::string()); 
 
 	/*  blocking call for on_message callback: virtual void on_message(delivery&, message&); */
 	proton::message receive(); 

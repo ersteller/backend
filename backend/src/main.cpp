@@ -9,7 +9,9 @@ using namespace std;
 
 static void testFunction(Backend& backend){
 
-	proton::message m("Hello from testcase!");
+
+	proton::message m("Hello from testcase!");    // proton::message* pcM = new proton::message("Hello from testcase!");
+	std::cerr << m.body() << std::endl;
 
 	// 1. Send a message to MQ
 	backend.send(m);
