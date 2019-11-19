@@ -1,7 +1,6 @@
 
 
-#include <proton/container.hpp>
-#include <proton/message.hpp>
+
 #include "backend.hpp"
 
 using namespace std;
@@ -24,6 +23,43 @@ static void testFunction(Backend& backend){
     // 4. Return invalid Message to Sender 
 }
 
+
+/* receiver main */
+int receiver_main(std::string& conn_url, std::string& addr) {
+    int message_count = 100;
+    try {
+        BReceiver recv(conn_url, 
+	            addr, 
+				testFunction,
+				std::string("database.db"), 
+				message_count);
+        proton::container(recv).run();
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return 1;
+}
+
+int sender_main(std::string& conn_url, std::string& addr) {
+
+    // conn_url, addr, testFunction, "database.db")
+
+    int message_count = 100;
+    try {
+        BSender send(conn_url, 
+	            addr, 
+				testFunction,
+				std::string("database.db"), 
+				message_count);
+        proton::container(send).run();
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return 1;
+}
+
 int main(int argc, char **argv) {
 	int iRet = 1;
 
@@ -32,12 +68,12 @@ int main(int argc, char **argv) {
 		std::string addr = argc > 2 ? argv[2] : "examples";
 
 		/* create instance of ouf class and let it call our test function when it is ready */
-		Backend backend(conn_url, addr, testFunction, "database.db");
-		backend.init();
+		// Backend backend(conn_url, addr, testFunction, "database.db");
+		//backend.init();
+	    // proton::container(backend).run();
 
-		/* let proton handle handshaking */ 
-		// this is not elegant TODO: find a way to hide it in the backend class
-	    proton::container(backend).run();
+		sender_main(conn_url, addr);
+		receiver_main(conn_url, addr);
 
 		iRet = 0; 
 	}

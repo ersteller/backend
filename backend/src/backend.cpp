@@ -91,7 +91,7 @@ void Backend::logToDatabase(const proton::message& m, std::string dst, std::stri
 
 	char* szError = NULL;
 	/* time, topic, src, dst, message matches pur database template database.db */
-	const char* szSqlFmt = "INSERT INTO messagelog (time, topic, src, dst, message) VALUES (%"PRId64", \"%s\", \"%s\", \"%s\", \"%s\"); ";
+	const char* szSqlFmt = "INSERT INTO messagelog (time, topic, src, dst, message) VALUES (%" PRId64 ", \"%s\", \"%s\", \"%s\", \"%s\"); ";
 	char szSql[4096] = {};
 
 	const char* szTopic = addr_.c_str();
@@ -139,4 +139,5 @@ void Backend::on_message(proton::delivery &d, proton::message &m)  {
 void Backend::on_connection_close(proton::connection &) {
 	m_sender.close();
 }
+
 
