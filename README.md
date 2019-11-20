@@ -1,80 +1,107 @@
-# backend
+# Backend
+### Task Description 
+> 
+> 3. BACKEND (C++ AND JAVA) 
+> Create client libraries to interact with selected Message Broker, preferred Qpid over AMQP, but can be any JMS Broker.
+>  
+> Libraries must have classes to: 
+> - Send a message to MQ 
+> - Receive message from MQ 
+> - Persist Messages in a Database (choose Columns appropriate) 
+> - Return invalid Message to Sender 
+> 
+> We would like to see working solution and review code, project structure, tests. Please consider > one of these two options: 
+> - Create and share your git repository 
+> - (or) Send, via email, project sources and instructions how to start it 
 
-3. BACKEND (C++ AND JAVA) 
-Create client libraries to interact with selected Message Broker, preferred Qpid over AMQP, but can be any JMS broker. 
-Libraries must have classes to: 
-- Send a message to MQ 
-- Receive message from MQ 
-- Persist Messages in a Database (choose Columns appropriate) 
-- Return invalid Message to Sender 
-We would like to see working solution and review code, project structure, tests. Please consider one of these two options: 
-- Create and share your git repository 
-- (or) Send, via email, project sources and instructions how to start it 
+### DONE:
+1. Project structure: Build tools, libraries, source, cmake project
+1. Send a message to MQ: Class BSender
+2. Receive message from MQ: Class BReceiver
+3. Persist Messages in a Database Class Backend:
+
+### TODO: 
+- Return invalid Message to Sender: not jet implemented 
+- Tests: for lack of modern test framework. With more time and reason i would look into googletest.
 
 
-DONE
-1. Send a message to MQ
-3. Persist Messages in a Database (choose Columns appropriate)
-TODO: 
-2. Receive message from MQ
-4. Return invalid Message to Sender 
-5. review code, 
-6. project structure
-7. tests
 
-review code, project structure, tests. 
+# Instructions 
+I have tested this with windows10 but Linux should work as well. 
 
+You can build localy with cmake if you have the libqpid-proton-cpp.so and sqlite3.so. Then Cmake is required. 
 
-checkout: 
+Alternatively you can use **Docker** for building ```qpid_proton``` and ```backend``` and testing. 
+Here I describe the Docker approch. 
+
+## Requirements
+- Docker
+
+### checkout: 
 ```
 git clone https://github.com/ersteller/backend.git --recurse-submodules
 git submodule update --init
 ```
 
-Build docker: 
-```
-docker build . -t builder:latest -f ./dev/Dockerfile
-```
-
-Btart docker with following command:
-```
-docker run -it -v D:\Users\z_jan_cronus\workspace\backend\build:/build -v D:\Users\z_jan_cronus\workspace\backend\:/project --name builder builder:latest /bin/bash
+### Go into project directory and create a build directory
+``` 
+cd backend && mkdir build
 ```
 
-To build qpid-cpp
+### Build docker image *builder*: 
+```
+docker build --rm  . -t builder:latest -f ./dev/Dockerfile
+```
+
+### Start docker with following command:
+```
+# Windows PS:
+docker run -it -v  ${pwd}/build:/build -v ${pwd}:/project --name builder builder:latest /bin/bash
+
+# Linux: 
+docker run -it -v  $(pwd)/build:/build -v $(pwd):/project --name builder builder:latest /bin/bash
+```
+
+(OPTIONAL): To build qpid-cpp in docker
 ```
 mkdir /project/libs/qpid-cpp/build -p && cd /project/libs/qpid-cpp/build && cmake .. && make
 ```
 
-To build qpid-proton
-maybe we dont need this:  -DCMAKE_CXX_FLAGS=-std=c++11
+### To build qpid-proton in docker
 ```
 mkdir /project/libs/qpid-proton/build -p && cd /project/libs/qpid-proton/build && cmake .. && make
 ``` 
-To build qpid proton python bindings 
+
+(OPTIONAL): To build qpid proton python bindings 
 ```
 cd /project/libs/qpid-proton/build && cmake .. -DSYSINSTALL_PYTHON=ON -DSYSINSTALL_BINDINGS=OFF
 ```
 
-For building backend 
+### For building backend in docker
 ```
+# Release build
 cd /build && cmake /project/backend/ && make
+
+# Debug build with symbols unoptimized
 cd /build && cmake -DCMAKE_BUILD_TYPE=Debug /project/backend/ && make 
 ```
-To run a backend test:  
-```
-cd /build && python /project/tests/loadlib.py
-```
 
-To start and stop a local broker call following script
-this boker will have a queue named "examples" ready
+To start and stop a local broker call following script on your **host machine**
+This broker will have a queue named "examples" ready
 ```
 ./dev/start_broker.sh
 ./dev/stop_broker.sh
 ``` 
 
-To run the application call
+To run the application get your IP (to tell backend where the broker is) with "ipconfig" or "ip -a" call the binary in docker with the following command.
 ```
-./backend //<yourBrokerIp>:5672 examples
+# syntax
+./backend //<yourIp>:5672 examples
+# example
 ./backend //192.168.178.56:5672 examples
+```
+
+There should be 6 messages in the database.db now. You can verify the content with the following command
+```
+echo "SELECT * from messagelog;" | sqlite3 database.db
 ```

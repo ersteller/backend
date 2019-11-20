@@ -1,11 +1,13 @@
-﻿# CMakeList.txt: CMake-Projekt für "backend". Schließen Sie die Quelle ein, und definieren Sie
-# projektspezifische Logik hier.
+﻿# CMakeList.txt: CMake-Projekt for "backend".
 #
 cmake_minimum_required (VERSION 3.8)
 
 project(backend VERSION 1.0.1 DESCRIPTION "backend description")
 
+# this line generates a executable binary file
 add_executable (backend src/backend.cpp "src/backend.hpp" src/main.cpp src/sender.cpp src/receiver.cpp)
+
+# this line generates a shared object "libbackend.so"
 #add_library(backend SHARED src/backend.cpp "src/backend.hpp" src/main.cpp src/sender.cpp src/receiver.cpp)
 set_target_properties(backend PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(backend PROPERTIES PUBLIC_HEADER include/backend_pub.h)
