@@ -15,39 +15,28 @@
 #include "Backend.hpp"
 
 
-BSender::BSender(const std::string &s, 
+BSender::BSender(const std::string &u, 
 	            const std::string& a, 
-				void(*pfnIsReady)(Backend& b),
+				void(*pfnIsReady)(void* b),
 				std::string szDbPath, 
-				int c)
+				int c) : Backend(u, a, pfnIsReady, szDbPath, c)
 {
-    conn_url_ = s;
-    addr_ = a;
     sent = 0;
     confirmed = 0;
-    total = 0;
+    total = c;
 }
 BSender::~BSender(){}
 
 void BSender::on_sendable(proton::sender &sender) {
-    while (sender.credit() && sent < total) {
-        proton::message msg;
-        std::map<std::string, int> m;
-        m["sequence"] = sent + 1;
-
-        msg.id(sent + 1);
-        msg.body(m);
-
-        logToDatabase(msg, conn_url_, std::string("localhost"));
-
-        sender.send(msg);
-        sent++;
-    }
+	m_sender = sender;
+    Backend::clb(this);
 }
 
 void BSender::on_container_start(proton::container &c) {
-    std::string url = conn_url_ + std::string("/") + addr_;
-    listener = c.listen(url, listen_handler);
+    //std::string url = conn_url_ + std::string("/") + addr_;
+    //listener = c.listen(url, listen_handler);
+    c.connect(conn_url_);
+    //Backend::on_container_start(c);
 }
 void BSender::on_tracker_accept(proton::tracker &t) {
     confirmed++;
@@ -59,6 +48,25 @@ void BSender::on_tracker_accept(proton::tracker &t) {
     }
 }
 
+void BSender::on_connection_open(proton::connection& c) {
+    c.open_sender(addr_);
+}
+
 void BSender::on_transport_close(proton::transport &) {
     sent = confirmed;
+}
+
+void BSender::on_connection_close(proton::connection &) {
+	m_sender.close();
+}
+
+/* this is the send wrapper four our class */
+void BSender::send(const proton::message &m) {
+	logToDatabase(m, conn_url_, std::string("localhost"));
+	m_sender.send(m);
+    sent++;
+
+    if (sent >= total)
+        m_sender.close();
+    
 }

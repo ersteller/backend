@@ -21,7 +21,8 @@
                 "pipeCwd": "${workspaceFolder}"
             },
             "sourceFileMap": {
-                "\\project\\backend\\src\\":"${workspaceFolder}\\backend\\src\\"
+                "\\project\\backend\\src\\":"${workspaceFolder}\\backend\\src\\",
+                "\\project\\libs\\qpid-proton\\cpp\\src\\": "${workspaceFolder}\\libs\\qpid-proton\\cpp\\src\\"
             },
             "MIMode": "gdb",
             "setupCommands": [

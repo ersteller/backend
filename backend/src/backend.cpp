@@ -36,13 +36,14 @@
 
 using namespace std;
 
-typedef void (*ClbFunctionType)(Backend& s);
+typedef void (*ClbFunctionType)(void* s);
 
-Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(Backend &s), string szDbPath, int c) {		
+Backend::Backend(const std::string& u, const std::string& a, void(*funSendable)(void* s), string szDbPath, int c) {		
     conn_url_ = u;
 	addr_ = a;
 	m_pfnSendable = (void*)funSendable;	
 	m_szDBPath = szDbPath;
+	m_db = NULL;
 }
 
 /* default constructo */
@@ -70,19 +71,18 @@ void Backend::init(){
 void Backend::on_container_start(proton::container& c)  {
 	c.connect(conn_url_);
 }
+
 void Backend::on_connection_open(proton::connection& c)  {
 	c.open_receiver(addr_);
 	c.open_sender(addr_);
 }
-void Backend::on_sendable(proton::sender &s)  {
-	m_sender = s;
-    
+
+void Backend::clb(void* pvinstance){
 	if (m_pfnSendable)
 	{
 		ClbFunctionType clbSendable = (ClbFunctionType)m_pfnSendable;
-		clbSendable(*this);
+		clbSendable(pvinstance);
 	}
-	s.close();
 }
 
 static int dbCallback(void*,int,char**,char**)
@@ -119,28 +119,4 @@ void Backend::logToDatabase(const proton::message& m, std::string dst, std::stri
 					&szError                                  /* Error msg written here */
 				);
 }
-
-/* this is the send wrapper four our class */
-void Backend::send(const proton::message &m) {
-	logToDatabase(m, conn_url_, std::string("localhost"));
-	m_sender.send(m);
-}
-
-// this is a wrapper with sql log for the base function: virtual void on_message(delivery&, message&);
-proton::message Backend::receive(  ) { 
-
-	/* TODO: get it from on_message  */
-	proton::message m("Received this message!"); 
-	cout << "wait for received message: " << m.body() << endl; 
-	return m;
-}
-
-void Backend::on_message(proton::delivery &d, proton::message &m)  {
-	std::cout << "received: " << m.body() << std::endl;
-	d.connection().close();
-}
-void Backend::on_connection_close(proton::connection &) {
-	m_sender.close();
-}
-
 

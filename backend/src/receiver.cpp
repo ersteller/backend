@@ -32,9 +32,13 @@
 
 #include "backend.hpp"
 
-BReceiver::BReceiver(const std::string& u, const std::string& a, void(*pfnIsReady)(Backend& b), std::string szDbPath, int c) {
-    conn_url_ = u;
-    addr_ = a;
+BReceiver::BReceiver(   const std::string& u, 
+                        const std::string& a,
+                        void(*pfnIsReady)(void* b),
+                        std::string szDbPath, 
+                        int c
+                    ) : Backend(u, a, pfnIsReady, szDbPath, c)
+{
     received = 0;
     expected = c;
 }
@@ -42,14 +46,20 @@ BReceiver::BReceiver(const std::string& u, const std::string& a, void(*pfnIsRead
 BReceiver::~BReceiver() {}
 
 void BReceiver::on_container_start(proton::container &c)  {
-    std::string url = conn_url_ + std::string("/") + addr_;
-    listener = c.listen(url, listen_handler);
+    // std::string url = conn_url_ + std::string("/") + addr_;
+    // listener = c.listen(url, listen_handler);
+    c.connect(conn_url_);
+}
+
+void BReceiver::on_connection_open(proton::connection& c) {
+    c.open_receiver(addr_);
 }
 
 void BReceiver::on_message(proton::delivery &d, proton::message &msg) {
+    /*
     if (proton::coerce<int>(msg.id()) < received) {
         return; // Ignore duplicate
-    }
+    }*/ 
 
     /* log message to database */
     logToDatabase(msg, std::string("localhost"), conn_url_);
@@ -65,4 +75,3 @@ void BReceiver::on_message(proton::delivery &d, proton::message &msg) {
         listener.stop();
     }
 }
-
