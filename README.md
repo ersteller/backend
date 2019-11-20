@@ -105,3 +105,9 @@ There should be 6 messages in the database.db now. You can verify the content wi
 ```
 echo "SELECT * from messagelog;" | sqlite3 database.db
 ```
+
+# Debugging
+Debugging in docker container is streight forward
+1. Make sure the builder container is running. 
+2. Replace the ip in ```.vscode/launch.json``` with your ip. ```"args": ["//192.168.178.56:5672", "examples"],``` 
+3. Open vs code on the project next to the README.md and press F5 (cpp vscode extension required)
