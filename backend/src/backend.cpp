@@ -19,7 +19,8 @@
  *
  */
 
-
+#include <ostream>
+#include <sstream>
 #include <iostream>
 #include <stdio.h>
 #include <sys/time.h>
@@ -100,8 +101,13 @@ void Backend::logToDatabase(const proton::message& m, std::string dst, std::stri
 	const char* szTopic = addr_.c_str();
 	const char* szDest = dst.c_str();     // m.to().c_str();
 	const char* szSrc = src.c_str();
-	char* szBody = &m.encode()[13];       // m.body().c_str(); is not working this is some dirty stuff and should not be in 
-	                                      //  production code but would need more research of proton api 
+
+	/* convert message to string */
+	proton::value value = m.body();
+	std::ostringstream os;
+    os << std::boolalpha << value;
+    std::string strmessage = os.str();
+	const char* szBody = strmessage.c_str();       // m.body().c_str(); is not working so we explicitly convert to ostringstream and then to char* 
 
 	/* get a timestamp of microsec */
 	uint64_t ullTsusec = 0;
